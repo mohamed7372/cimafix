@@ -4,10 +4,16 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use App\Http\Requests\Auth\RegisterValidator;
+use App\Http\Requests\Auth\LoginValidator;
 
-class UserController extends Controller
+class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterValidator $request)
     {
         $fields = $request->validate([
             'name' => 'required|string',
@@ -26,16 +32,11 @@ class UserController extends Controller
         return response()->json($response, 201);
     }
 
-    public function login(Request $request)
+    public function login(LoginValidator $request)
     {
-        $credentials = $request->validate([
-            'name' => 'required|string',
-            'password' => 'required',
-        ]);
+        $user = User::where('name', $request['name'])->first();
 
-        $user = User::where('name', $credentials['name'])->first();
-
-        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+        if (!$user || !Hash::check($request['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'name' => ['The provided credentials are incorrect.'],
             ]);
