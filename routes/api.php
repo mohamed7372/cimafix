@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\Discover\MovieController;
 use App\Http\Controllers\Discover\SerieController;
+use App\Http\Controllers\User\FavoriteController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,7 +19,7 @@ use App\Http\Controllers\Discover\SerieController;
 */
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register'])->name('register');
 
 // Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('movies')->controller(MovieController::class)->group(function () {
@@ -33,5 +34,11 @@ Route::post('/register', [AuthController::class, 'register']);
         Route::get('/top', 'getSeriesTop');
         Route::get('/{id}', 'getSerieDetails');
         Route::get('/', 'getSeries');
+    });
+
+    Route::prefix('users')->controller(FavoriteController::class)->group(function () {
+        Route::post('/{user}/favorites', 'addFavorite');
+        // Route::delete('/', 'deleteFavorite');
+        // Route::get('/', 'getAllFavorites');
     });
 // });

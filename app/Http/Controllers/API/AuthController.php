@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Auth\RegisterValidator;
@@ -35,8 +35,28 @@ class AuthController extends Controller
 
     public function login(LoginValidator $request)
     {
-        $user = User::where('name', $request['name'])->first();
+        $credentials = $request->only('name', 'password');
 
+        if(Auth::attempt($credentials)){
+            $user = Auth::user();
+            $token = $user->createToken('authToken')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'user' => $user,
+                'access_token' => $token,
+                'message' => 'Login successful',
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid credentials',
+        ], 401);
+        
+
+        $user = User::where('name', $request['name'])->first();
+        
         if (!$user || !Hash::check($request['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'name' => ['The provided credentials are incorrect.'],
