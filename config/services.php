@@ -30,5 +30,9 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
-
+    'tmdb' => [
+        'endpoint' => env('TMDB_ENDPOINT'),
+        'api' => env('TMDB_APP_KEY'),
+        'token' => env('TMDB_TOKEN'),
+    ]
 ];
